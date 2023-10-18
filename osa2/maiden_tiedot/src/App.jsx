@@ -95,7 +95,7 @@ const App = () => {
     const countryName = newCountry.name.common
 
     if (countryName !== cachedCountry) {
-      getWeatherData(newCountry.latlng).then(data => {
+      getWeatherData(newCountry.capitalInfo.latlng).then(data => {
         setNewFilter(countryName)
         setNewCachedCountry(countryName)
         setNewWeatherData(data)

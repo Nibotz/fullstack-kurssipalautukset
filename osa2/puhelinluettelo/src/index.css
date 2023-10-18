@@ -1,4 +1,8 @@
 
+body {
+    background-color: gray;
+}
+
 .notification {
     color: green;
     background: lightgrey;

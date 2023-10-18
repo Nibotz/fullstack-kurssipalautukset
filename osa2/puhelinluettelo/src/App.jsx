@@ -88,7 +88,7 @@ const App = () => {
     
     setTimeout(() => {
       setMessage(null)
-    }, 4000)
+    }, 5000)
   }
 
   const addNewErrorMessage = message => {
@@ -96,47 +96,47 @@ const App = () => {
 
     setTimeout(() => {
       setErrorMessage(null)
-    }, 4000)
+    }, 5000)
   }
 
   const addNewPerson = (event) => {
     event.preventDefault()
 
-    const personInd = persons.findIndex(person => person.name === newName)
-
-    if (personInd !== -1) {
-      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-
-        const updatedPerson = { ...persons[personInd], number: newNumber }
-
+    const oldPerson = persons.find(person => person.name === newName)
+    if (oldPerson !== undefined) {
+      if (confirm(`${oldPerson.name} is already added to phonebook, replace the old number with a new one?`)) {
+        
         personService
-          .update(updatedPerson.id, updatedPerson)
-          .then(data => {
+          .update(oldPerson.id, { ...oldPerson, number: newNumber })
+          .then(updatedPerson => {
+            setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person))
             setNewName('')
             setNewNumber('')
 
-            addNewNotification(`Changed information of ${data.name}`)
+            addNewNotification(`Changed information of ${updatedPerson.name}`)
           })
           .catch(error => {
-            addNewErrorMessage(`Information of ${updatedPerson.name} has been removed from server`)
+            if (error.response !== undefined) {
+              addNewErrorMessage(error.response.data.error)
+            } else {
+              addNewErrorMessage(`Information of ${oldPerson.name} has been removed from server`)
+            }
           })
       }
       return
     }
 
-    const newPerson = {
-      name: newName,
-      number: newNumber,
-    }
-
     personService
-      .create(newPerson)
-      .then(data => {
-        setPersons(persons.concat(data))
+      .create({ name: newName, number: newNumber })
+      .then(newPerson => {
+        setPersons(persons.concat(newPerson))
         setNewName('')
         setNewNumber('')
 
-        addNewNotification(`Added ${data.name}`)
+        addNewNotification(`Added ${newPerson.name}`)
+      })
+      .catch(error => {
+        addNewErrorMessage(error.response.data.error)
       })
   }
 
@@ -144,12 +144,12 @@ const App = () => {
     if (confirm(`Delete ${person.name} ?`)) {
       personService
         .remove(person.id)
-        .then(data => {
+        .then(() => {
           setPersons(persons.filter(currentPerson => currentPerson.id !== person.id))
 
           addNewNotification(`Deleted ${person.name}`)
         })
-        .catch(error => {
+        .catch(() => {
           addNewErrorMessage(`Information of ${person.name} has already been removed from server`)
         })
     }

@@ -11,6 +11,14 @@ describe('blog queries', () => {
   beforeAll(async () => {
     await User.deleteMany({})
     await User.insertMany(helper.initialUsers)
+
+    /*
+    get new valid token:
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'hellas', password: 'abc123' })
+    console.log(response.body.token)
+    */
   })
 
   beforeEach(async () => {

@@ -16,7 +16,7 @@ const BlogForm = ({ addNotification, noteFormRef, blogs, setBlogs }) => {
     blogService.create(newBlog)
       .then(createdBlog => {
         noteFormRef.current.toggleVisibility()
-      
+
         setBlogs(blogs.concat(createdBlog))
         setTitle('')
         setAuthor('')

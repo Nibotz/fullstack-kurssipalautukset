@@ -1,27 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
+import BlogList from './components/BlogList'
 import blogService from './services/blogs'
 
-const BlogList = ({ blogs, setBlogs, user }) => {
-  const sortedBlogs = blogs.sort((b1, b2) => b2.likes - b1.likes)
-
-  return (
-    <div>
-      {sortedBlogs.map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          user={user}
-          blogs={blogs}
-          setBlogs={setBlogs}
-        />
-      )}
-    </div>
-  )
-}
 
 const App = () => {
   const [notification, setNotification] = useState(null)
@@ -32,7 +15,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -59,16 +42,16 @@ const App = () => {
   return (
     <>
       {notification}
-      {!user && 
+      {!user &&
       <LoginForm
         addNotification={addNotification}
         setUser={setUser}
       />
       }
-      {user && 
+      {user &&
       <div>
         <h2>blogs</h2>
-        <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p> 
+        <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
         <Togglable toggleText='new note' ref={noteFormRef}>
           <h2>create new</h2>
           <BlogForm

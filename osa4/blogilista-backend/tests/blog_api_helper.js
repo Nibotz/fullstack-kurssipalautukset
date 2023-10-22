@@ -6,12 +6,22 @@ const initialUsers = [
     username: 'hellas',
     name: 'Arto Hellas',
     password: '$2b$10$c1M20kMd7AzctBz0xJ1YUOAmQ4gE62icDU7wZmg40dcB6WYGJ/qRS', // = abc123
+    blogs: [
+      '65317bcbba28b4dda401210e',
+      '65317bcbba28b4dda4012113',
+      '65317bccba28b4dda4012118',
+    ],
     _id: '6531780de128ca4672812484'
   },
   {
     username: 'mluukkai',
     name: 'Matti Luukkainen',
     password: '$2b$10$R2oR4xKcZLRV7kSbS12ghO40wR.nxleCLWqUM5Ec9/lhaidQH0iCK', // = todella_hyvä_salasana,
+    blogs: [
+      '65317bccba28b4dda401211d',
+      '65317bccba28b4dda4012122',
+      '65317bccba28b4dda4012127',
+    ],
     _id: '6531780de128ca4672812488'
   }
 ]

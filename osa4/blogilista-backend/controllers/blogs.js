@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const { userExtractor } = require('../utils/middleware')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -24,48 +25,39 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   user.blogs = user.blogs.concat(blog._id)
   await user.save()
 
-  const savedBlog = await blog.save()
+  const savedBlog = (await blog.save()).toJSON()
+  savedBlog.user = user.toJSON()
+
   response.status(201).json(savedBlog)
 })
 
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   const user = request.user
 
-  const blog = await Blog.findById(request.params.id)
-  if (!blog) {
-    return response.status(404).end()
-  }
-
-  if (blog.user.toString() !== user._id.toString()) {
+  if (!user.blogs.some(id => id.toString() === request.params.id)) {
     return response.status(401).json({
       error: 'blog cannot be deleted by this user'
     })
   }
 
-  await blog.deleteOne()
+  user.blogs = user.blogs.filter(id => id.toString() !== request.params.id)
+  await user.save()
+
+  await Blog.findByIdAndRemove(request.params.id)
   response.status(204).end()
 })
 
-blogsRouter.put('/:id', userExtractor, async (request, response) => {
-  const user = request.user
+blogsRouter.put('/:id', async (request, response) => {
+  const { title, author, url, user, likes } = request.body
 
-  const blog = await Blog.findById(request.params.id)
-  if (!blog) {
-    return response.status(404).end()
-  }
-
-  if (blog.user.toString() !== user._id.toString()) {
-    return response.status(401).json({
-      error: 'blog cannot be modified by this user'
-    })
-  }
-
-  const newBlog = await Blog.findByIdAndUpdate(
+  const updatedBlog = (await Blog.findByIdAndUpdate(
     request.params.id,
-    { ...request.body },
+    { title, author, url, likes, user },
     { new: true }
-  )
-  response.json(newBlog)
+  )).toJSON()
+  updatedBlog.user = (await User.findById(updatedBlog.user)).toJSON()
+
+  response.json(updatedBlog)
 })
 
 module.exports = blogsRouter

@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
-import blogService from '../services/blogs'
 
-const Blog = ({ blog, user, blogs, setBlogs }) => {
+const Blog = ({ blog, addLike, removeBlog }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -13,48 +12,20 @@ const Blog = ({ blog, user, blogs, setBlogs }) => {
     marginBottom: 5
   }
 
-  const addLike = () => {
-    const { author, title, url, likes, user } = blog
-
-    const newBlog = {
-      author, title, url, user: user.id, likes: likes+1
-    }
-
-    blogService
-      .update(blog.id, newBlog)
-      .then(updatedBlog => {
-        setBlogs(blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b))
-      })
-      .catch(error => {
-        console.error(error)
-      })
-  }
-
-  const removeBlog = () => {
-    if (confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      blogService
-        .remove(blog.id)
-        .then(() => {
-          setBlogs(blogs.filter(b => b.id !== blog.id))
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    }
-  }
-
   return (
     <div style={blogStyle}>
-      {blog.title} {blog.author}
-      <button onClick={() => setVisible(!visible)}>{visible ? 'hide' : 'view'}</button>
+      <div>
+        {blog.title} {blog.author}
+        <button onClick={() => setVisible(!visible)}>{visible ? 'hide' : 'view'}</button>
+      </div>
       <div style={{ display: visible ? '' : 'none' }}>
-        <a>{blog.url}</a>
+        <a href={blog.url}>{blog.url}</a>
         <div>
-          {blog.likes}
+          likes: {blog.likes}
           <button onClick={addLike}>like</button>
         </div>
         <div>{blog.user.name}</div>
-        {blog.user.username === user.username &&
+        {removeBlog &&
           <button onClick={removeBlog}>remove</button>
         }
       </div>
@@ -63,9 +34,8 @@ const Blog = ({ blog, user, blogs, setBlogs }) => {
 }
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
-  blogs: PropTypes.array.isRequired,
-  setBlogs: PropTypes.func.isRequired
+  addLike: PropTypes.func.isRequired,
+  removeBlog: PropTypes.any
 }
 
 export default Blog

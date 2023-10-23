@@ -27,16 +27,30 @@ const App = () => {
     }
   }, [])
 
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-  }
-
   const addNotification = (message, time, type='notification') => {
     setNotification(<div className={type}>{message}</div>)
     setTimeout(() => {
       setNotification(null)
     }, time)
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+  }
+
+  const createBlog = (newBlog) => {
+    blogService.create(newBlog)
+      .then(createdBlog => {
+        noteFormRef.current.toggleVisibility()
+
+        setBlogs(blogs.concat(createdBlog))
+
+        addNotification(`a new blog ${createdBlog.title} by ${createdBlog.author} added`, 5000)
+      })
+      .catch(error => {
+        addNotification(`error: ${error.response.data.error}`, 5000, 'error')
+      })
   }
 
   return (
@@ -52,14 +66,12 @@ const App = () => {
       <div>
         <h2>blogs</h2>
         <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
+
         <Togglable toggleText='new note' ref={noteFormRef}>
           <h2>create new</h2>
-          <BlogForm
-            addNotification={addNotification}
-            noteFormRef={noteFormRef}
-            blogs={blogs} setBlogs={setBlogs}
-          />
+          <BlogForm createBlog={createBlog} />
         </Togglable>
+
         <BlogList blogs={blogs} setBlogs={setBlogs} user={user} />
       </div>
       }

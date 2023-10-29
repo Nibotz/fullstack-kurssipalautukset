@@ -10,7 +10,7 @@ const App = () => {
   const [notification, setNotification] = useState(null)
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const noteFormRef = useRef()
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -42,7 +42,7 @@ const App = () => {
   const createBlog = (newBlog) => {
     blogService.create(newBlog)
       .then(createdBlog => {
-        noteFormRef.current.toggleVisibility()
+        blogFormRef.current.toggleVisibility()
 
         setBlogs(blogs.concat(createdBlog))
 
@@ -67,7 +67,7 @@ const App = () => {
         <h2>blogs</h2>
         <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
 
-        <Togglable toggleText='new note' ref={noteFormRef}>
+        <Togglable toggleText='new blog' ref={blogFormRef}>
           <h2>create new</h2>
           <BlogForm createBlog={createBlog} />
         </Togglable>

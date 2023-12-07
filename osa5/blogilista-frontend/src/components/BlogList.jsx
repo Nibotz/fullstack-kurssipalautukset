@@ -1,57 +1,32 @@
-import PropTypes from 'prop-types'
-import blogService from '../services/blogs'
-import Blog from './Blog'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import BlogForm from './BlogForm'
 
-const BlogList = ({ blogs, setBlogs, user }) => {
-  const sortedBlogs = blogs.sort((b1, b2) => b2.likes - b1.likes)
+const BlogList = () => {
+  const sortedBlogs = useSelector(state => state.blogs)
+    .slice() // copy blog array for sorting
+    .sort((b1, b2) => b2.likes - b1.likes)
 
-  const addLike = (blog) => {
-    const { author, title, url, likes, user } = blog
-
-    const newBlog = {
-      author, title, url, user: user.id, likes: likes+1
-    }
-
-    blogService
-      .update(blog.id, newBlog)
-      .then(updatedBlog => {
-        setBlogs(blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b))
-      })
-      .catch(error => {
-        console.error(error)
-      })
-  }
-
-  const removeBlog = (blog) => {
-    if (confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      blogService
-        .remove(blog.id)
-        .then(() => {
-          setBlogs(blogs.filter(b => b.id !== blog.id))
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    }
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
   }
 
   return (
-    <div>
-      {sortedBlogs.map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          addLike={() => addLike(blog)}
-          removeBlog={blog.user.username === user.username ? () => removeBlog(blog) : null}
-        />
-      )}
-    </div>
+    <>
+      <BlogForm />
+      <div>
+        {sortedBlogs.map(blog => (
+          <div key={blog.id} className="blog" style={blogStyle}>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </div>
+        ))}
+      </div>
+    </>
   )
-}
-BlogList.propTypes = {
-  blogs: PropTypes.array.isRequired,
-  setBlogs: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired
 }
 
 export default BlogList

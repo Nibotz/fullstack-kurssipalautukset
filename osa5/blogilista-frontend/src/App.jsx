@@ -1,81 +1,47 @@
-import { useState, useEffect, useRef } from 'react'
-import BlogForm from './components/BlogForm'
+import { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LoginForm from './components/LoginForm'
-import Togglable from './components/Togglable'
 import BlogList from './components/BlogList'
-import blogService from './services/blogs'
-
+import UserList from './components/UserList'
+import UserPage from './components/UserPage'
+import BlogPage from './components/BlogPage'
+import Navigation from './components/Navigation'
+import { useDispatch, useSelector } from 'react-redux'
+import { initialBlogs } from './reducers/blogReducer'
+import { initialUsers } from './reducers/userReducer'
+import { initialLogin } from './reducers/loginReducer'
 
 const App = () => {
-  const [notification, setNotification] = useState(null)
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
-  const blogFormRef = useRef()
+  const dispatch = useDispatch()
+  const notification = useSelector(state => state.notification)
+  const user = useSelector(state => state.user)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
+    dispatch(initialBlogs())
+    dispatch(initialUsers())
+    dispatch(initialLogin())
   }, [])
-
-  useEffect(() => {
-    const userData = window.localStorage.getItem('loggedBlogappUser')
-    if (userData) {
-      const user = JSON.parse(userData)
-      blogService.setToken(user.token)
-      setUser(user)
-    }
-  }, [])
-
-  const addNotification = (message, time, type='notification') => {
-    setNotification(<div className={type}>{message}</div>)
-    setTimeout(() => {
-      setNotification(null)
-    }, time)
-  }
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-  }
-
-  const createBlog = (newBlog) => {
-    blogService.create(newBlog)
-      .then(createdBlog => {
-        blogFormRef.current.toggleVisibility()
-
-        setBlogs(blogs.concat(createdBlog))
-
-        addNotification(`a new blog ${createdBlog.title} by ${createdBlog.author} added`, 5000)
-      })
-      .catch(error => {
-        addNotification(`error: ${error.response.data.error}`, 5000, 'error')
-      })
-  }
 
   return (
-    <>
-      {notification}
-      {!user &&
-      <LoginForm
-        addNotification={addNotification}
-        setUser={setUser}
-      />
-      }
-      {user &&
-      <div>
-        <h2>blogs</h2>
-        <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
+    <Router>
+      {notification && (
+        <div className={notification.type}>{notification.message}</div>
+      )}
 
-        <Togglable toggleText='new blog' ref={blogFormRef}>
-          <h2>create new</h2>
-          <BlogForm createBlog={createBlog} />
-        </Togglable>
+      {!user && <LoginForm />}
 
-        <BlogList blogs={blogs} setBlogs={setBlogs} user={user} />
-      </div>
-      }
-    </>
+      {user && <Navigation />}
+
+      <Routes>
+        <Route path="/" element={user && <BlogList />} />
+
+        <Route path="/blogs" element={user && <BlogList />} />
+        <Route path="/blogs/:id" element={user && <BlogPage />} />
+
+        <Route path="/users" element={user && <UserList />} />
+        <Route path="/users/:id" element={user && <UserPage />} />
+      </Routes>
+    </Router>
   )
 }
 

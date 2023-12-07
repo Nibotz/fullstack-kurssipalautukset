@@ -26,25 +26,31 @@ const BlogPage = () => {
   }
   return (
     <div>
-      <h2>{blog.title}</h2>
-      <a href={blog.url}>{blog.url}</a>
-      <div>
-        {blog.likes} likes
-        <button onClick={() => dispatch(addBlogLike(blog))}>like</button>
+      <div className="blog-info">
+        <h2>{blog.title}</h2>
+        <p>
+          <a href={blog.url}>{blog.url}</a>
+        </p>
+        <p>
+          {blog.likes} likes
+          <button onClick={() => dispatch(addBlogLike(blog))}>like</button>
+        </p>
+        <p>added by {blog.user.name}</p>
+        {user.name === blog.user.name && (
+          <button onClick={tryRemoveBlog}>delete</button>
+        )}
       </div>
-      <div>added by {blog.user.name}</div>
-      {user.name === blog.user.name ? (
-        <button onClick={tryRemoveBlog}>delete</button>
-      ) : null}
-      <h3>comments</h3>
-      <CommentForm
-        addComment={comment => dispatch(addBlogComment(blog, comment))}
-      />
-      <ul>
-        {blog.comments.map(comment => (
-          <li key={comment}>{comment}</li>
-        ))}
-      </ul>
+      <div className="comments">
+        <h2>comments</h2>
+        <CommentForm
+          addComment={comment => dispatch(addBlogComment(blog, comment))}
+        />
+        <ul>
+          {blog.comments.map(comment => (
+            <li key={comment}>{comment}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

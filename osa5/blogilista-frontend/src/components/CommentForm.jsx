@@ -18,7 +18,7 @@ const CommentForm = ({ addComment }) => {
     <Togglable toggleText="add comment" ref={toggleRef}>
       <form onSubmit={newComment}>
         <div>
-          comment:
+          <label>comment:</label>
           <input
             type="text"
             value={comment}

@@ -6,20 +6,15 @@ const Navigation = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
 
-  const navigationStyle = {
-    background: 'lightgrey',
-    padding: '2px'
-  }
-
   return (
     <>
-      <div style={navigationStyle}>
+      <div className="navigation">
         <Link to={'/blogs'}>blogs</Link>
         <Link to={'/users'}>users</Link>
         <span>{user.name} logged in</span>
-        <button onClick={() => dispatch(userLogout())}>logout</button>
+        <Link onClick={() => dispatch(userLogout())}>logout</Link>
       </div>
-      <h2>blog app</h2>
+      <h1>blog app</h1>
     </>
   )
 }

@@ -22,7 +22,7 @@ const LoginForm = () => {
       <h2>Log in to application</h2>
       <form onSubmit={handleLogin}>
         <div>
-          username
+          <label>username</label>
           <input
             id="username"
             type="text"
@@ -31,7 +31,7 @@ const LoginForm = () => {
           />
         </div>
         <div>
-          password
+          <label>password</label>
           <input
             id="password"
             type="password"

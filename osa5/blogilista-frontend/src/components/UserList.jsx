@@ -5,7 +5,7 @@ const UserList = () => {
   const users = useSelector(state => state.users)
 
   return (
-    <div>
+    <div className="users">
       <h2>Users</h2>
       <table>
         <thead>
@@ -17,7 +17,7 @@ const UserList = () => {
         <tbody>
           {users.map(user => (
             <tr key={user.id}>
-              <td>
+              <td className="user-link">
                 <Link to={`/users/${user.id}`}>{user.name}</Link>
               </td>
               <td>{user.blogs.length}</td>
